@@ -27,8 +27,8 @@ pipeline {
                 script {
                     echo 'Verificando e finalizando processos na porta 8090...'
                     sh '''
-                    PID=$(lsof -t -i:8090)
-                    if [ ! -z "$PID" ]; then
+                    PID=$(netstat -tulnp 2>/dev/null | grep :8090 | awk '{print $7}' | cut -d'/' -f1)
+                    if [ -n "$PID" ]; then
                         echo "Matando processo $PID..."
                         kill -9 $PID
                     else
