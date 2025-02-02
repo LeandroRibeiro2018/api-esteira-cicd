@@ -47,6 +47,8 @@ pipeline {
                 echo 'Iniciando o aplicativo Spring Boot...'
                 sh '''
                 nohup java -jar target/*.jar --server.port=8090 > output.log 2>&1 &
+                sleep 5  # Aguarda alguns segundos para garantir que subiu
+                netstat -tulnp | grep 8090 || echo "Erro: aplicação não subiu corretamente!"
                 '''
             }
         }
@@ -55,6 +57,7 @@ pipeline {
     post {
         always {
             echo 'Pipeline concluído!'
+            sh 'tail -n 20 output.log || echo "Nenhum log encontrado!"'  // Exibe os últimos logs da API
         }
         success {
             echo 'Pipeline executado com sucesso.'
