@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        MAVEN_HOME = '/usr/share/maven'              // Caminho padrão do Maven no Linux
-        PATH = "${env.PATH}:${MAVEN_HOME}/bin"         // Adiciona o Maven ao PATH
-        MAVEN_OPTS = "-Dmaven.test.failure.ignore=true"// Ignora falhas nos testes
+        MAVEN_HOME = '/usr/share/maven'
+        PATH = "${env.PATH}:${MAVEN_HOME}/bin"
+        MAVEN_OPTS = "-Dmaven.test.failure.ignore=true"
     }
 
     stages {
@@ -38,10 +38,9 @@ pipeline {
             }
             steps {
                 echo 'Matando instâncias anteriores na porta 8090 (se houver)...'
-                // Finaliza qualquer processo que esteja usando a porta 8090
                 sh 'fuser -k 8090/tcp || true'
                 
-                echo 'Iniciando o aplicativo Spring Boot em background...'
+                echo 'Iniciando o aplicativo Spring Boot em background na porta 8090...'
                 // Inicia a aplicação para escutar em todas as interfaces (0.0.0.0) na porta 8090
                 sh 'nohup java -jar target/*.jar --server.address=0.0.0.0 --server.port=8090 > output.log 2>&1 &'
                 
