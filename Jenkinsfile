@@ -46,7 +46,7 @@ pipeline {
             steps {
                 echo 'Iniciando o aplicativo Spring Boot...'
                 sh '''
-                nohup java -jar target/*.jar --server.port=8090 > output.log 2>&1 &
+                nohup java -jar target/api-esteira-cicd-0.0.1.jar --server.port=8090 > output.log 2>&1 &
                 sleep 5  # Aguarda alguns segundos para garantir que subiu
                 netstat -tulnp | grep 8090 || echo "Erro: aplicação não subiu corretamente!"
                 '''
