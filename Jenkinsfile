@@ -14,38 +14,40 @@ pipeline {
                 checkout scm
             }
         }
+
         stage('Build') {
             steps {
                 echo 'Compilando o aplicativo Spring Boot...'
                 sh 'mvn clean install -e -X'
             }
         }
-        stage('Test') {
+
+        stage('Kill Process on Port 8090') {
             steps {
-                echo 'Executando testes...'
-                sh 'mvn test -e -X'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: '**/target/surefire-reports/*.xml', allowEmptyArchive: true
-                    junit '**/target/surefire-reports/*.xml'
+                script {
+                    echo 'Verificando e finalizando processos na porta 8090...'
+                    sh '''
+                    PID=$(lsof -t -i:8090)
+                    if [ ! -z "$PID" ]; then
+                        echo "Matando processo $PID..."
+                        kill -9 $PID
+                    else
+                        echo "Nenhum processo rodando na porta 8090."
+                    fi
+                    '''
                 }
             }
         }
+
         stage('Deploy') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                echo 'Matando instâncias anteriores na porta 8090 (se houver)...'
-                sh 'fuser -k 8090/tcp || true'
-                
-                echo 'Iniciando o aplicativo Spring Boot em background na porta 8090...'
-                // Inicia a aplicação para escutar em todas as interfaces (0.0.0.0) na porta 8090
-                sh 'nohup java -jar target/*.jar --server.address=0.0.0.0 --server.port=8090 > output.log 2>&1 &'
-                
-                // Aguarda alguns segundos para a aplicação iniciar
-                sh 'sleep 10'
+                echo 'Iniciando o aplicativo Spring Boot...'
+                sh '''
+                nohup java -jar target/*.jar --server.port=8090 > output.log 2>&1 &
+                '''
             }
         }
     }
