@@ -35,13 +35,13 @@ pipeline {
             }
         }
 
-        stage('Run Application') {
+        stage('Deploy') {
             when {
                 expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                echo 'Iniciando o aplicativo Spring Boot...'
-                sh 'mvn spring-boot:run'
+                echo 'Iniciando o aplicativo Spring Boot em background...'
+                sh 'nohup java -jar target/*.jar > output.log 2>&1 &'
             }
         }
     }
