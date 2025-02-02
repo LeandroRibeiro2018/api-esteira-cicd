@@ -18,14 +18,14 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compilando o aplicativo Spring Boot...'
-                bat '"%MAVEN_HOME%\\bin\\mvn" clean install -e -X'  // Inclui opções de erro detalhado e depuração
+                sh '"%MAVEN_HOME%\\bin\\mvn" clean install -e -X'  // Inclui opções de erro detalhado e depuração
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Executando testes...'
-                bat '"%MAVEN_HOME%\\bin\\mvn" test -e -X'  // Executa testes com detalhes
+                sh '"%MAVEN_HOME%\\bin\\mvn" test -e -X'  // Executa testes com detalhes
             }
             post {
                 always {
@@ -41,7 +41,7 @@ pipeline {
             }
             steps {
                 echo 'Iniciando o aplicativo Spring Boot...'
-                bat '"%MAVEN_HOME%\\bin\\mvn" spring-boot:run'
+                sh '"%MAVEN_HOME%\\bin\\mvn" spring-boot:run'
             }
         }
     }
